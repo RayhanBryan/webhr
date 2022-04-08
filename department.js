@@ -1,7 +1,7 @@
-function loadContent(){
+function loadContent(page){
     clearResult();
     var xhr = new XMLHttpRequest;
-    var url = "http://localhost:1234/departments/findAll";
+    var url = `http://localhost:1234/departments/findAllWithPagination?page=${page}&size=10`;
     xhr.onloadstart = function(){
         document.getElementById("button").innerHTML = "Loading . . .";
     }
@@ -12,7 +12,7 @@ function loadContent(){
         if (this.responseText !== ""){
             var res = JSON.parse(this.responseText);
             var data = res.data;
-            document.getElementById("hasil").innerHTML += `<tr>
+            document.getElementById("hasil").innerHTML = `<tr>
             <th>ID</th>
             <th>Department Name</th>
             <th>Manager ID</th>
@@ -33,10 +33,33 @@ function loadContent(){
                 <td><button class="delete" onclick="deleteData(${id})">DELETE</button></td>
                 </tr>`
             }
-            document.getElementById("button").innerHTML = "Load lagi";
-            // setTimeout(function(){
-            //     document.getElementById("button").innerHTML = "Load lagi";
-            // }, 3000);
+            if (page == 0) {
+                document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
+            
+            <div class="col-3"><button class="button-nav">&lt;</button></div>
+            <div class="col-6 text-center page-div"><div class="page-number">Page: ${page+1}</div></div>
+            <div class="col-3"><button class="button-nav" onclick="loadContent(${page+1})">&gt;</button></div>
+            
+            </div>`
+            }
+            else if (page == res.totalPages-1){
+                document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
+            
+            <div class="col-3"><button class="button-nav" onclick="loadContent(${page-1})">&lt;</button></div>
+            <div class="col-6 text-center page-div"><div class="page-number">Page: ${page+1}</div></div>
+            <div class="col-3"><button class="button-nav">&gt;</button></div>
+            
+            </div>`
+            }
+            else {
+            document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
+            
+            <div class="col-3"><button class="button-nav" onclick="loadContent(${page-1})">&lt;</button></div>
+            <div class="col-6 text-center page-div"><div class="page-number">Page: ${page+1}</div></div>
+            <div class="col-3"><button class="button-nav" onclick="loadContent(${page+1})">&gt;</button></div>
+            
+            </div>`
+            }
         }
     };
     xhr.open("GET", url, true);
@@ -107,7 +130,7 @@ function updateData(){
         console.log(this.responseText);
     };
     window.location = department-start.html;
-    return false;
+    return ret;
 }
 
 function sendData(){
@@ -134,6 +157,83 @@ function sendData(){
     };
 
     return false;
+}
+
+function showBox() {
+    document.getElementById("searchbox").innerHTML = `<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Cari" id="search">
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary button-search" type="button" onclick="findByDepartmentName(0)">Search</button>
+    </div>
+  </div>
+  <table id="hasil" class="table table-responsive text-center table-dark justify-content-center table-striped"></table>`
+  clearResult();
+}
+
+function findByDepartmentName(page){
+    clearResult();
+    var xhr = new XMLHttpRequest();
+    var dept = document.getElementById("search").value;
+    var url = `http://localhost:1234/departments/findByDepartmentName?departmentName=${dept}&page=${page}&size=10`;
+
+    xhr.onloadend = function(){
+        if (this.responseText !== ""){
+            var res = JSON.parse(this.responseText);
+            var data = res.data;
+            document.getElementById("hasil").innerHTML = `<tr>
+            <th>ID</th>
+            <th>Department Name</th>
+            <th>Manager ID</th>
+            <th>Location ID</th>
+            </tr>`
+            for (i=0; i<data.length; i++){
+                const newData = data[i];
+                const id = newData.departmentId;
+                const name = newData.departmentName;
+                const manager = newData.managerId;
+                const location = newData.locationId;
+                document.getElementById("hasil").innerHTML += `<tr> 
+                <td>${id}</td> 
+                <td>${name}</td>
+                <td>${manager}</td>
+                <td>${location}</td>
+                <td><a href="department-update.html?id=${id}"><button class="edit">EDIT</button></a></td>
+                <td><button class="delete" onclick="deleteData(${id})">DELETE</button></td>
+                </tr>`
+            }
+            if (page == 0) {
+                document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
+            
+            <div class="col-3"><button class="button-nav">&lt;</button></div>
+            <div class="col-6 text-center page-div"><div class="page-number">Page: ${page+1}</div></div>
+            <div class="col-3"><button class="button-nav" onclick="findByDepartmentName(${page+1})">&gt;</button></div>
+            
+            </div>`
+            }
+            else if (page == res.totalPages-1){
+                document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
+            
+            <div class="col-3"><button class="button-nav" onclick="findByDepartmentName(${page-1})">&lt;</button></div>
+            <div class="col-6 text-center page-div"><div class="page-number">Page: ${page+1}</div></div>
+            <div class="col-3"><button class="button-nav">&gt;</button></div>
+            
+            </div>`
+            }
+            else {
+            document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
+            
+            <div class="col-3"><button class="button-nav" onclick="findByDepartmentName(${page-1})">&lt;</button></div>
+            <div class="col-6 text-center page-div"><div class="page-number">Page: ${page+1}</div></div>
+            <div class="col-3"><button class="button-nav" onclick="findByDepartmentName(${page+1})">&gt;</button></div>
+            
+            </div>`
+            }
+        }
+    };
+    xhr.open("GET", url, true);
+    xhr.send();
+
+
 }
 
 // var urlParams = new URLSearchParams(window.location.search);
