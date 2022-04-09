@@ -2,9 +2,9 @@ function loadContent(page){
     clearResult();
     var xhr = new XMLHttpRequest;
     var url = `http://localhost:1234/departments/findAllWithPagination?page=${page}&size=10`;
-    xhr.onloadstart = function(){
-        document.getElementById("button").innerHTML = "Loading . . .";
-    }
+    // xhr.onloadstart = function(){
+    //     document.getElementById("button").innerHTML = "Loading . . .";
+    // }
     xhr.onerror = function(){
         alert("Gagal mengambil data");
     };
@@ -98,7 +98,8 @@ function getById(id){
 function onLoadData(){
     var link = window.location.search;
     var id = link.split('=').pop();
-    // alert(id);
+    alert(link);
+    alert(id);
     getById(id);
 }
 
@@ -155,7 +156,7 @@ function sendData(){
         }
         console.log(this.responseText);
     };
-
+    window.location = "department-start.html";
     return false;
 }
 
@@ -165,9 +166,7 @@ function showBox() {
     <div class="input-group-append">
       <button class="btn btn-outline-secondary button-search" type="button" onclick="findByDepartmentName(0)">Search</button>
     </div>
-  </div>
-  <table id="hasil" class="table table-responsive text-center table-dark justify-content-center table-striped"></table>`
-  clearResult();
+  </div>`
 }
 
 function findByDepartmentName(page){
@@ -210,7 +209,7 @@ function findByDepartmentName(page){
             
             </div>`
             }
-            else if (page == res.totalPages-1){
+            else if (page >= res.totalPages-1){
                 document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
             
             <div class="col-3"><button class="button-nav" onclick="findByDepartmentName(${page-1})">&lt;</button></div>
