@@ -72,12 +72,12 @@ function clearResult() {
 
 function deleteData(id){
     var xhr = new XMLHttpRequest;
-    var url = "http://localhost:1234/departments/delete";
+    var url = `http://localhost:1234/departments/delete?id=${id}`;
     if (confirm("Yakin?")){
-        xhr.open("DELETE", url+`?id=${id}` ,true);
+        xhr.open("DELETE", url ,true);
         xhr.send();
         alert("Sukses!");
-        setTimeout(loadContent(), 3000);
+        setTimeout(loadContent(0), 3000);
     } else {}
 }
 
@@ -98,8 +98,7 @@ function getById(id){
 function onLoadData(){
     var link = window.location.search;
     var id = link.split('=').pop();
-    alert(link);
-    alert(id);
+    // alert(id);
     getById(id);
 }
 
@@ -200,7 +199,7 @@ function findByDepartmentName(page){
                 <td><button class="delete" onclick="deleteData(${id})">DELETE</button></td>
                 </tr>`
             }
-            if (page == 0) {
+            if (page == 0 && res.totalPages !== 0) {
                 document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
             
             <div class="col-3"><button class="button-nav">&lt;</button></div>
@@ -209,7 +208,7 @@ function findByDepartmentName(page){
             
             </div>`
             }
-            else if (page >= res.totalPages-1){
+            else if (page >= res.totalPages-1 || res.totalPages == 0){
                 document.getElementById("navigation").innerHTML = `<div class="row text-center justify-content center">
             
             <div class="col-3"><button class="button-nav" onclick="findByDepartmentName(${page-1})">&lt;</button></div>
